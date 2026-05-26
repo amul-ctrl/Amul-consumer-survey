@@ -1,2 +1,2 @@
 # Amul-consumer-survey
-Ice cream beverages
+Ice creams beverages
