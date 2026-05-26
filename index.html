@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Amul Ice Cream Survey · Rajkot</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--r:#C0392B;--g:#E8A217;--dk:#1C0A00;--md:#7A4A2A;--bd:#EDD9C8;--wh:#FFFFFF;--sf:#FEF5EC;--cr:#FFFAF4}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--dk);font-family:'Plus Jakarta Sans',sans-serif}
+
+/* SPLASH */
+#splash{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;background:radial-gradient(ellipse at 30% 20%,#3D1A00,var(--dk) 65%)}
+.s-icon{font-size:64px;margin-bottom:20px;display:inline-block;animation:fl 3s ease-in-out infinite}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.s-title{font-family:'Fraunces',serif;font-size:34px;font-weight:900;color:#fff;line-height:1.2;margin-bottom:10px}
+.s-title em{color:var(--g);font-style:normal}
+.s-sub{font-size:13px;color:rgba(255,255,255,.45);line-height:1.7;margin-bottom:30px}
+.s-sub small{display:block;font-size:11px;color:rgba(255,255,255,.25);margin-top:4px}
+.s-btn{background:var(--r);color:#fff;border:none;border-radius:100px;padding:16px 40px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;width:100%;max-width:300px;box-shadow:0 8px 24px rgba(192,57,43,.4)}
+.s-note{font-size:10px;color:rgba(255,255,255,.2);margin-top:14px}
+
+/* SURVEY SHELL */
+#survey{height:100dvh;display:none;flex-direction:column;background:var(--dk);overflow:hidden}
+.pb{height:3px;background:rgba(255,255,255,.08);flex-shrink:0}
+.pf{height:100%;background:linear-gradient(90deg,var(--r),var(--g));transition:width .4s ease;width:0%}
+.pm{display:flex;justify-content:space-between;align-items:center;padding:12px 20px 8px;flex-shrink:0}
+.pm-brand{font-family:'Fraunces',serif;font-size:13px;font-weight:700;color:var(--g)}
+.pm-num{font-size:12px;color:rgba(255,255,255,.35)}
+.cv{flex:1;position:relative;padding:0 14px;overflow:hidden}
+
+/* CARDS */
+.card{position:absolute;inset:0;background:var(--wh);border-radius:22px 22px 0 0;padding:26px 20px 20px;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;flex-direction:column;gap:0}
+.card.show{display:flex;animation:ci .3s ease forwards}
+.card.bye-l{display:flex;animation:co-l .3s ease forwards}
+.card.bye-r{display:flex;animation:co-r .3s ease forwards}
+@keyframes ci{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes co-l{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-40px)}}
+@keyframes co-r{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(40px)}}
+
+/* NAV */
+.nav{padding:12px 14px 18px;display:flex;gap:10px;background:var(--dk);flex-shrink:0}
+.nb{width:46px;height:46px;border-radius:50%;border:1.5px solid rgba(255,255,255,.12);background:transparent;color:rgba(255,255,255,.4);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nn{flex:1;height:46px;border-radius:100px;border:none;background:var(--r);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer}
+.nn.gld{background:var(--g);color:var(--dk)}
+
+/* CARD INTERNALS */
+.qtag{display:inline-flex;align-items:center;background:var(--sf);border:1px solid var(--bd);border-radius:100px;padding:4px 10px;font-size:10px;font-weight:700;color:var(--md);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.qtext{font-family:'Fraunces',serif;font-size:20px;font-weight:900;line-height:1.3;color:var(--dk);margin-bottom:5px}
+.qguj{font-size:11px;color:var(--md);font-style:italic;margin-bottom:16px;line-height:1.5}
+.qhint{font-size:11px;color:var(--md);background:var(--sf);border-left:2px solid var(--g);padding:7px 11px;border-radius:0 8px 8px 0;margin-bottom:14px;line-height:1.5}
+
+/* OPTIONS */
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;align-items:center;gap:11px;padding:12px 14px;border:1.5px solid var(--bd);border-radius:12px;background:var(--wh);cursor:pointer;font-size:13px;color:var(--dk);font-weight:500;text-align:left;font-family:'Plus Jakarta Sans',sans-serif;transition:border-color .12s,background .12s}
+.opt.on{border-color:var(--r);background:#FEF0EE;color:var(--r)}
+.circ{width:17px;height:17px;border-radius:50%;border:1.5px solid #CCC;flex-shrink:0;position:relative;transition:all .12s}
+.opt.on .circ{background:var(--r);border-color:var(--r)}
+.opt.on .circ::after{content:'';position:absolute;width:6px;height:6px;border-radius:50%;background:#fff;top:50%;left:50%;transform:translate(-50%,-50%)}
+.opt.sq .circ{border-radius:5px}
+.opt.sq.on .circ::after{content:'✓';background:none;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;width:auto;height:auto}
+
+/* EMOJI GRID */
+.egrid{display:flex;flex-direction:column;gap:6px}
+.erow{display:grid;grid-template-columns:1fr repeat(5,36px);align-items:center;gap:3px;padding:7px 10px;background:var(--sf);border-radius:10px;border:1.5px solid transparent}
+.erow.t{border-color:var(--bd)}
+.elbl{font-size:12px;font-weight:600;color:var(--dk)}
+.ebtn{font-size:19px;width:36px;height:36px;border-radius:8px;border:1.5px solid transparent;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0}
+.ebtn.on{background:var(--r);transform:scale(1.1)}
+
+/* FLAVOUR PILLS */
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{padding:7px 13px;border-radius:100px;border:1.5px solid var(--bd);background:var(--wh);font-size:12px;font-weight:600;color:var(--md);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .12s}
+.pill.on{background:var(--g);border-color:var(--g);color:var(--dk)}
+
+/* TEXT INPUTS */
+.ota{width:100%;border:1.5px solid var(--bd);border-radius:12px;padding:12px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;color:var(--dk);background:var(--wh);resize:none;min-height:88px;outline:none}
+.ota:focus{border-color:var(--r)}
+.tinput{width:100%;border:none;border-bottom:1.5px solid var(--bd);padding:9px 3px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;color:var(--dk);background:transparent;outline:none;margin-bottom:6px}
+.tinput:focus{border-color:var(--r)}
+.tlbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--md);margin-bottom:4px;margin-top:12px}
+.tlbl:first-child{margin-top:0}
+
+/* PROFILE */
+.plbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--md);margin-bottom:7px;margin-top:14px}
+.plbl:first-child{margin-top:0}
+
+/* DONE */
+#done{min-height:100dvh;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;background:radial-gradient(ellipse at 70% 80%,#001A0A,var(--dk) 60%)}
+#done.show{display:flex}
+.d-icon{font-size:60px;margin-bottom:16px}
+.d-title{font-family:'Fraunces',serif;font-size:26px;font-weight:900;color:#fff;margin-bottom:8px}
+.d-sub{font-size:13px;color:rgba(255,255,255,.4);line-height:1.7;margin-bottom:24px}
+.d-btns{display:flex;flex-direction:column;gap:10px;width:100%;max-width:280px}
+.d-new{height:46px;border-radius:100px;border:none;background:var(--g);color:var(--dk);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+.d-exp{height:42px;border-radius:100px;border:1.5px solid rgba(255,255,255,.12);background:transparent;color:rgba(255,255,255,.5);font-size:12px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif}
+.d-cnt{font-size:11px;color:rgba(255,255,255,.2);margin-top:12px;line-height:1.6}
+
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <span class="s-icon">🍦</span>
+  <div class="s-title">Tell us about<br><em>ice cream</em> in Rajkot</div>
+  <div class="s-sub">13 quick questions — under 5 minutes.<br>Ice cream ane beverages baabat chhoto survey.
+    <small>Amul Rajkot Branch · Market Study 2024</small>
+  </div>
+  <button class="s-btn" onclick="startSurvey()">Sharu Kariye · Start →</button>
+  <div class="s-note">All responses are anonymous and confidential</div>
+</div>
+
+<!-- SURVEY -->
+<div id="survey">
+  <div class="pb"><div class="pf" id="pf"></div></div>
+  <div class="pm">
+    <span class="pm-brand">🍦 AMUL · RAJKOT</span>
+    <span class="pm-num" id="pn">1 / 13</span>
+  </div>
+  <div class="cv" id="cv"></div>
+  <div class="nav">
+    <button class="nb" id="bb" onclick="goBack()">←</button>
+    <button class="nn" id="bn" onclick="goNext()">Next →</button>
+  </div>
+</div>
+
+<!-- DONE -->
+<div id="done">
+  <div class="d-icon">🎉</div>
+  <div class="d-title">Aabhar! Thank you!</div>
+  <div class="d-sub">Tamaro jawaab save thayo chhe.<br>Your response has been recorded successfully.</div>
+  <div class="d-btns">
+    <button class="d-new" onclick="newSurvey()">+ New response</button>
+    <button class="d-exp" onclick="exportCSV()">📥 Export all responses (CSV)</button>
+  </div>
+  <div class="d-cnt" id="dcnt"></div>
+</div>
+
+<script>
+var STORE = 'amul_rjt_v3';
+var cur = 0;
+var R = {};
+
+function getAll() {
+  try { return JSON.parse(localStorage.getItem(STORE) || '[]'); } catch(e) { return []; }
+}
+function saveR(r) {
+  var a = getAll(); a.push(r); localStorage.setItem(STORE, JSON.stringify(a));
+}
+
+var Qs = [
+  {
+    id:'q1', tag:'🧠 Brand Recall',
+    text:'Which ice cream brand comes to your mind first?',
+    guj:'Ice cream sanbhu to pehlu kaun si brand yaad aave?',
+    hint:'Ask before naming ANY brand. Do not prompt or suggest.',
+    type:'open', placeholder:'Write exactly what they say...', req:true
+  },
+  {
+    id:'q2', tag:'🛒 How Often',
+    text:'How often do you buy or eat ice cream?',
+    guj:'Tamne ketli vaakhte ice cream khaava male chhe?',
+    type:'single', req:true,
+    opts:['Almost every day 🌞','2–3 times a week','Once a week','A few times a month','Only in summer ☀️','Only for special occasions 🎉']
+  },
+  {
+    id:'q3', tag:'📍 Where You Buy',
+    text:'Where do you usually buy ice cream?',
+    guj:'Tamne ice cream sauthi vadhare kyaathi male chhe?',
+    type:'single', req:true,
+    opts:['Kirana / dairy shop nearby 🏪','Amul parlour / APO','Supermarket / D-Mart','Local parlour (Satyavijay / Rajdeep)','Kulfi cart / gola stall on street 🛺','Restaurant or café']
+  },
+  {
+    id:'q4', tag:'❤️ Your Preference',
+    text:'Which ice cream brand do you buy most often — and why that brand?',
+    guj:'Tamne sauthi gamti brand kaun si chhe ane kyun?',
+    hint:'Most important question. Get the reason in their own words.',
+    type:'twotext', req:true,
+    fields:['Brand most often bought','Why that brand — in their own words']
+  },
+  {
+    id:'q5', tag:'⭐ Rate Amul',
+    text:'Rate Amul ice cream on these 👇',
+    guj:'Amul ice cream ne rate karo — emoji choose karo.',
+    type:'emoji',
+    rows:['Taste / Swad','Value for money','Flavour variety','Easy to find'],
+    emojis:['😍','🙂','😐','😕','🤷']
+  },
+  {
+    id:'q6', tag:'🏆 Brand Awareness',
+    text:'Which of these brands or places do you know or have visited?',
+    guj:'Aama thi kaun kaun ne jaano chho ya avya chho? Badha tick karo.',
+    type:'check',
+    opts:['Amul parlour / APO','Vadilal','Havmor','Satyavijay Patel Ice Cream','Rajdeep Ice Cream','Hocco','Baskin Robbins','Chhaswala','Local kulfi cart','Khushboo Ice Cream']
+  },
+  {
+    id:'q7', tag:'🔄 Switching',
+    text:'Have you shifted brands in the last 1–2 years?',
+    guj:'Chhella 1-2 varsho maa koi brand change karyo?',
+    type:'single', req:true,
+    opts:['Shifted AWAY from Amul to another brand','Shifted TO Amul from another brand ✅','No change — I always buy Amul','No change — I rarely or never buy Amul']
+  },
+  {
+    id:'q8', tag:'🍨 Favourite Flavour',
+    text:'What is your all-time favourite ice cream flavour?',
+    guj:'Tamni all-time favourite flavour kaun si chhe?',
+    type:'flavour',
+    opts:['Kesar Pista 🌸','Mango 🥭','Rajbhog','Sitaphal','Chocolate 🍫','Butterscotch','Vanilla','Strawberry 🍓','Other']
+  },
+  {
+    id:'q9', tag:'🥛 Amul Beverages',
+    text:'Have you tried Amul Kool, Lassi, or Chaach?',
+    guj:'Amul Kool, Lassi ke Chaach try karyu chhe?',
+    type:'single', req:true,
+    opts:['Yes — I buy them regularly 👍','Tried once, do not buy regularly','No — I prefer fresh lassi or chaach from shops','No — I prefer Frooti / Maaza / soft drinks','Never tried / not aware of these']
+  },
+  {
+    id:'q10', tag:'🍹 Amul Tru',
+    text:'Have you seen or tried Amul Tru — Amul\'s new fruit drink?',
+    guj:'Amul Tru — Amul no nawo fruit drink — tamne khaber chhe ke try karyu chhe?',
+    hint:'Amul Tru is a new fruit-based drink (Mango, Mixed Fruit, Guava). Show pack image if available.',
+    type:'tru'
+  },
+  {
+    id:'q11', tag:'💰 Price Sensitivity',
+    text:'If Amul ice cream became ₹5–10 more expensive, what would you do?',
+    guj:'Je Amul ice cream ₹5–10 mahengu thay to shun karo?',
+    type:'single', req:true,
+    opts:['Still buy Amul — it is worth it 💪','Buy it less often, switch sometimes','Switch to a cheaper brand or kulfi cart','Depends on the product — some yes some no']
+  },
+  {
+    id:'q12', tag:'💡 Your Suggestion',
+    text:'One thing you would tell Amul to improve its ice cream in Rajkot?',
+    guj:'Amul ne ek sujhav apo — shu sudharvu joie?',
+    hint:'Record exactly what they say. Do not paraphrase.',
+    type:'open', placeholder:'Their exact words...'
+  },
+  {
+    id:'q13', tag:'👤 Quick Profile',
+    text:'Last few details — interviewer fills this part',
+    guj:'Aa section interviewer bharse. Respondent ne seedha puchho nahi.',
+    type:'profile'
+  }
+];
+
+var TOTAL = Qs.length;
+
+// ── RENDER CARD ────────────────────────────────────────────────────────────
+function makeCard(i) {
+  var q = Qs[i];
+  var s = R[q.id] || {};
+  var d = document.createElement('div');
+  d.className = 'card';
+  d.id = 'card' + i;
+
+  var h = '<div class="qtag">' + q.tag + '</div>' +
+          '<div class="qtext">' + q.text + '</div>' +
+          '<div class="qguj">' + q.guj + '</div>';
+  if (q.hint) h += '<div class="qhint">' + q.hint + '</div>';
+
+  // OPEN TEXT
+  if (q.type === 'open') {
+    h += '<textarea class="ota" id="ota' + i + '" placeholder="' + (q.placeholder || '') + '">' + (s.v || '') + '</textarea>';
+  }
+
+  // SINGLE SELECT
+  else if (q.type === 'single') {
+    h += '<div class="opts">';
+    for (var j = 0; j < q.opts.length; j++) {
+      var on = (s.v === q.opts[j]) ? ' on' : '';
+      h += '<button class="opt' + on + '" data-qi="' + i + '" data-oi="' + j + '" onclick="pickSingle(this)">' +
+           '<span class="circ"></span>' + q.opts[j] + '</button>';
+    }
+    h += '</div>';
+  }
+
+  // CHECKBOX
+  else if (q.type === 'check') {
+    h += '<div class="opts">';
+    for (var j = 0; j < q.opts.length; j++) {
+      var arr = s.v || [];
+      var on = (arr.indexOf(q.opts[j]) > -1) ? ' on' : '';
+      h += '<button class="opt sq' + on + '" data-qi="' + i + '" data-val="' + q.opts[j].replace(/"/g,'&quot;') + '" onclick="pickCheck(this)">' +
+           '<span class="circ"></span>' + q.opts[j] + '</button>';
+    }
+    h += '</div>';
+  }
+
+  // EMOJI GRID
+  else if (q.type === 'emoji') {
+    h += '<div class="egrid">';
+    for (var ri = 0; ri < q.rows.length; ri++) {
+      var row = q.rows[ri];
+      var touched = s[row] ? ' t' : '';
+      h += '<div class="erow' + touched + '" id="er' + i + '_' + ri + '">' +
+           '<span class="elbl">' + row + '</span>';
+      for (var ei = 0; ei < q.emojis.length; ei++) {
+        var eon = (s[row] === q.emojis[ei]) ? ' on' : '';
+        h += '<button class="ebtn' + eon + '" data-qi="' + i + '" data-ri="' + ri + '" data-row="' + row + '" data-em="' + q.emojis[ei] + '" onclick="pickEmoji(this)">' + q.emojis[ei] + '</button>';
+      }
+      h += '</div>';
+    }
+    h += '</div>';
+  }
+
+  // FLAVOUR PILLS
+  else if (q.type === 'flavour') {
+    h += '<div class="pills">';
+    for (var j = 0; j < q.opts.length; j++) {
+      var on = (s.v === q.opts[j]) ? ' on' : '';
+      h += '<button class="pill' + on + '" data-qi="' + i + '" data-val="' + q.opts[j] + '" onclick="pickFlavour(this)">' + q.opts[j] + '</button>';
+    }
+    h += '</div>';
+    h += '<div style="margin-top:14px"><div class="plbl">Does Amul offer this flavour?</div>' +
+         '<div class="pills">' +
+         '<button class="pill' + (s.amul === 'yes' ? ' on' : '') + '" data-qi="' + i + '" data-amul="yes" onclick="pickAmul(this)">✅ Yes, Amul has it</button>' +
+         '<button class="pill' + (s.amul === 'no' ? ' on' : '') + '" data-qi="' + i + '" data-amul="no" onclick="pickAmul(this)">❌ No / Not sure</button>' +
+         '</div></div>';
+  }
+
+  // TWO TEXT FIELDS
+  else if (q.type === 'twotext') {
+    for (var fi = 0; fi < q.fields.length; fi++) {
+      var val = (s.fields && s.fields[fi]) ? s.fields[fi] : '';
+      h += '<div class="tlbl">' + q.fields[fi] + '</div>' +
+           '<input class="tinput" id="tt' + i + '_' + fi + '" value="' + val + '" placeholder="Type here...">';
+    }
+  }
+
+  // AMUL TRU
+  else if (q.type === 'tru') {
+    var awareOpts = ['Yes — I have tried Amul Tru 👍','Seen it but not tried yet','Heard of it but never seen','Never heard of Amul Tru'];
+    h += '<div class="opts">';
+    for (var j = 0; j < awareOpts.length; j++) {
+      var on = (s.aware === awareOpts[j]) ? ' on' : '';
+      h += '<button class="opt' + on + '" data-qi="' + i + '" data-aw="' + awareOpts[j].replace(/"/g,'&quot;') + '" onclick="pickTruAware(this)">' +
+           '<span class="circ"></span>' + awareOpts[j] + '</button>';
+    }
+    h += '</div>';
+    var showRating = (s.aware && s.aware.indexOf('tried') > -1) ? '' : 'display:none';
+    h += '<div id="trurating' + i + '" style="' + showRating + '">' +
+         '<div class="plbl" style="margin-top:16px">Rate Amul Tru (taste, value, would you buy again)</div>' +
+         '<div class="egrid">';
+    var truRows = ['Taste','Value for money','Would buy again'];
+    for (var ri = 0; ri < truRows.length; ri++) {
+      var row = truRows[ri];
+      var touched = s[row] ? ' t' : '';
+      h += '<div class="erow' + touched + '" id="trr' + i + '_' + ri + '">' +
+           '<span class="elbl">' + row + '</span>';
+      var ems = ['😍','🙂','😐','😕','🤷'];
+      for (var ei = 0; ei < ems.length; ei++) {
+        var eon = (s[row] === ems[ei]) ? ' on' : '';
+        h += '<button class="ebtn' + eon + '" data-qi="' + i + '" data-ri="' + ri + '" data-row="' + row + '" data-em="' + ems[ei] + '" data-tru="1" onclick="pickTruEmoji(this)">' + ems[ei] + '</button>';
+      }
+      h += '</div>';
+    }
+    h += '</div>';
+    var compOpts = ['Much better than Frooti / Maaza','Slightly better','About the same','Slightly worse','Would not buy again'];
+    h += '<div class="plbl" style="margin-top:12px">Compared to Frooti / Maaza / Real</div><div class="opts">';
+    for (var j = 0; j < compOpts.length; j++) {
+      var on = (s.comp === compOpts[j]) ? ' on' : '';
+      h += '<button class="opt' + on + '" style="font-size:12px;padding:9px 12px" data-qi="' + i + '" data-comp="' + compOpts[j].replace(/"/g,'&quot;') + '" onclick="pickTruComp(this)">' +
+           '<span class="circ"></span>' + compOpts[j] + '</button>';
+    }
+    h += '</div></div>';
+  }
+
+  // PROFILE
+  else if (q.type === 'profile') {
+    var ages = ['Below 18','18–25','26–40','40+'];
+    var genders = ['Male','Female','Other'];
+    var locs = ['Kirana exit','Amul parlour','Supermarket','Street / market','Near kulfi cart'];
+    var clusters = ['C1 – North','C2 – West','C3 – Central','C4 – East','C5 – South'];
+
+    h += '<div class="plbl">Age group</div><div class="pills">';
+    for (var j = 0; j < ages.length; j++) {
+      h += '<button class="pill' + (s.age === ages[j] ? ' on' : '') + '" data-qi="' + i + '" data-pf="age" data-pv="' + ages[j] + '" onclick="pickProfile(this)">' + ages[j] + '</button>';
+    }
+    h += '</div><div class="plbl">Gender</div><div class="pills">';
+    for (var j = 0; j < genders.length; j++) {
+      h += '<button class="pill' + (s.gender === genders[j] ? ' on' : '') + '" data-qi="' + i + '" data-pf="gender" data-pv="' + genders[j] + '" onclick="pickProfile(this)">' + genders[j] + '</button>';
+    }
+    h += '</div><div class="plbl">Intercept location</div><div class="pills">';
+    for (var j = 0; j < locs.length; j++) {
+      h += '<button class="pill' + (s.loc === locs[j] ? ' on' : '') + '" data-qi="' + i + '" data-pf="loc" data-pv="' + locs[j] + '" onclick="pickProfile(this)">' + locs[j] + '</button>';
+    }
+    h += '</div><div class="plbl">Cluster</div><div class="pills">';
+    for (var j = 0; j < clusters.length; j++) {
+      h += '<button class="pill' + (s.cluster === clusters[j] ? ' on' : '') + '" data-qi="' + i + '" data-pf="cluster" data-pv="' + clusters[j] + '" onclick="pickProfile(this)">' + clusters[j] + '</button>';
+    }
+    h += '</div>';
+  }
+
+  d.innerHTML = h;
+  return d;
+}
+
+// ── INTERACTION HANDLERS ───────────────────────────────────────────────────
+function pickSingle(btn) {
+  var i = parseInt(btn.dataset.qi);
+  var j = parseInt(btn.dataset.oi);
+  var q = Qs[i];
+  R[q.id] = { v: q.opts[j] };
+  var btns = btn.closest('.opts').querySelectorAll('.opt');
+  for (var k = 0; k < btns.length; k++) btns[k].classList.remove('on');
+  btn.classList.add('on');
+}
+
+function pickCheck(btn) {
+  var i = parseInt(btn.dataset.qi);
+  var val = btn.dataset.val;
+  var q = Qs[i];
+  if (!R[q.id]) R[q.id] = { v: [] };
+  if (!R[q.id].v) R[q.id].v = [];
+  var idx = R[q.id].v.indexOf(val);
+  if (idx > -1) { R[q.id].v.splice(idx, 1); btn.classList.remove('on'); }
+  else { R[q.id].v.push(val); btn.classList.add('on'); }
+}
+
+function pickEmoji(btn) {
+  var i = parseInt(btn.dataset.qi);
+  var ri = parseInt(btn.dataset.ri);
+  var row = btn.dataset.row;
+  var em = btn.dataset.em;
+  var q = Qs[i];
+  if (!R[q.id]) R[q.id] = {};
+  R[q.id][row] = em;
+  var er = document.getElementById('er' + i + '_' + ri);
+  var ebs = er.querySelectorAll('.ebtn');
+  for (var k = 0; k < ebs.length; k++) ebs[k].classList.remove('on');
+  btn.classList.add('on');
+  er.classList.add('t');
+}
+
+function pickFlavour(btn) {
+  var i = parseInt(btn.dataset.qi);
+  var val = btn.dataset.val;
+  var q = Qs[i];
+  if (!R[q.id]) R[q.id] = {};
+  R[q.id].v = val;
+  var ps = btn.closest('.pills').querySelectorAll('.pill');
+  for (var k = 0; k < ps.length; k++) ps[k].classList.remove('on');
+  btn.classList.add('on');
+}
+
+function pickAmul(btn) {
+  var i = parseInt(btn.dataset.qi);
+  var q = Qs[i];
+  if (!R[q.id]) R[q.id] = {};
+  R[q.id].amul = btn.dataset.amul;
+  var ps = btn.closest('.pills').querySelectorAll('.pill');
+  for (var k = 0; k < ps.length; k++) ps[k].classList.remove('on');
+  btn.classList.add('on');
+}
+
+function pickTruAware(btn) {
+  var i = parseInt(btn.dataset.qi);
+  var val = btn.dataset.aw;
+  var q = Qs[i];
+  if (!R[q.id]) R[q.id] = {};
+  R[q.id].aware = val;
+  var btns = btn.closest('.opts').querySelectorAll('.opt');
+  for (var k = 0; k < btns.length; k++) btns[k].classList.remove('on');
+  btn.classList.add('on');
+  var rb = document.getElementById('trurating' + i);
+  if (rb) rb.style.display = (val.indexOf('tried') > -1) ? '' : 'none';
+}
+
+function pickTruEmoji(btn) {
+  var i = parseInt(btn.dataset.qi);
+  var ri = parseInt(btn.dataset.ri);
+  var row = btn.dataset.row;
+  var em = btn.dataset.em;
+  var q = Qs[i];
+  if (!R[q.id]) R[q.id] = {};
+  R[q.id][row] = em;
+  var er = document.getElementById('trr' + i + '_' + ri);
+  var ebs = er.querySelectorAll('.ebtn');
+  for (var k = 0; k < ebs.length; k++) ebs[k].classList.remove('on');
+  btn.classList.add('on');
+  er.classList.add('t');
+}
+
+function pickTruComp(btn) {
+  var i = parseInt(btn.dataset.qi);
+  var val = btn.dataset.comp;
+  var q = Qs[i];
+  if (!R[q.id]) R[q.id] = {};
+  R[q.id].comp = val;
+  var btns = btn.closest('.opts').querySelectorAll('.opt');
+  for (var k = 0; k < btns.length; k++) btns[k].classList.remove('on');
+  btn.classList.add('on');
+}
+
+function pickProfile(btn) {
+  var i = parseInt(btn.dataset.qi);
+  var field = btn.dataset.pf;
+  var val = btn.dataset.pv;
+  var q = Qs[i];
+  if (!R[q.id]) R[q.id] = {};
+  R[q.id][field] = val;
+  var ps = btn.closest('.pills').querySelectorAll('.pill');
+  for (var k = 0; k < ps.length; k++) ps[k].classList.remove('on');
+  btn.classList.add('on');
+}
+
+// ── COLLECT CURRENT CARD ───────────────────────────────────────────────────
+function collect() {
+  var q = Qs[cur];
+  var card = document.getElementById('card' + cur);
+  if (!card) return;
+  if (q.type === 'open') {
+    var ta = card.querySelector('#ota' + cur);
+    if (ta) R[q.id] = { v: ta.value };
+  } else if (q.type === 'twotext') {
+    var fields = [];
+    for (var fi = 0; fi < q.fields.length; fi++) {
+      var el = card.querySelector('#tt' + cur + '_' + fi);
+      fields.push(el ? el.value : '');
+    }
+    R[q.id] = { fields: fields };
+  }
+}
+
+// ── NAVIGATION ─────────────────────────────────────────────────────────────
+function goNext() {
+  collect();
+  var q = Qs[cur];
+  // Validate
+  if (q.req) {
+    var r = R[q.id] || {};
+    var ok = false;
+    if (q.type === 'open') ok = r.v && r.v.trim().length > 0;
+    else if (q.type === 'single') ok = !!r.v;
+    else if (q.type === 'twotext') ok = r.fields && r.fields[0] && r.fields[0].trim().length > 0;
+    else ok = true;
+    if (!ok) {
+      var card = document.getElementById('card' + cur);
+      card.style.animation = 'none';
+      card.offsetHeight;
+      card.style.animation = 'shake .3s ease';
+      return;
+    }
+  }
+  if (cur === TOTAL - 1) { finish(); return; }
+  transition('fwd');
+}
+
+function goBack() {
+  if (cur === 0) return;
+  collect();
+  transition('back');
+}
+
+function transition(dir) {
+  var old = document.getElementById('card' + cur);
+  if (old) {
+    old.classList.remove('show');
+    old.classList.add(dir === 'fwd' ? 'bye-l' : 'bye-r');
+    setTimeout(function() { if (old.parentNode) old.parentNode.removeChild(old); }, 320);
+  }
+  cur = dir === 'fwd' ? cur + 1 : cur - 1;
+  var nc = makeCard(cur);
+  document.getElementById('cv').appendChild(nc);
+  nc.classList.add('show');
+  updateUI();
+}
+
+function updateUI() {
+  document.getElementById('pf').style.width = ((cur + 1) / TOTAL * 100) + '%';
+  document.getElementById('pn').textContent = (cur + 1) + ' / ' + TOTAL;
+  var bn = document.getElementById('bn');
+  var bb = document.getElementById('bb');
+  if (cur === TOTAL - 1) { bn.textContent = 'Submit ✓'; bn.classList.add('gld'); }
+  else { bn.textContent = 'Next →'; bn.classList.remove('gld'); }
+  bb.style.opacity = cur === 0 ? '0.2' : '1';
+}
+
+// ── START / FINISH / NEW ───────────────────────────────────────────────────
+function startSurvey() {
+  document.getElementById('splash').style.display = 'none';
+  document.getElementById('survey').style.display = 'flex';
+  R = {}; cur = 0;
+  document.getElementById('cv').innerHTML = '';
+  var c = makeCard(0);
+  document.getElementById('cv').appendChild(c);
+  c.classList.add('show');
+  updateUI();
+}
+
+function finish() {
+  collect();
+  R._ts = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+  R._id = 'R' + Date.now().toString().slice(-6);
+  saveR(R);
+  document.getElementById('survey').style.display = 'none';
+  document.getElementById('done').classList.add('show');
+  var n = getAll().length;
+  document.getElementById('dcnt').textContent = n + ' response' + (n !== 1 ? 's' : '') + ' saved on this device. Export CSV to transfer to your analysis sheet.';
+}
+
+function newSurvey() {
+  document.getElementById('done').classList.remove('show');
+  document.getElementById('survey').style.display = 'flex';
+  document.getElementById('cv').innerHTML = '';
+  R = {}; cur = 0;
+  var c = makeCard(0);
+  document.getElementById('cv').appendChild(c);
+  c.classList.add('show');
+  updateUI();
+}
+
+// ── CSV EXPORT ─────────────────────────────────────────────────────────────
+function exportCSV() {
+  var all = getAll();
+  if (!all.length) { alert('No responses yet.'); return; }
+  var cols = ['ID','Timestamp',
+    'Q1_TopOfMind','Q2_Frequency','Q3_WhereBuy',
+    'Q4_PrefBrand','Q4_PrefWhy',
+    'Q5_Taste','Q5_ValueForMoney','Q5_FlavourVariety','Q5_EasyToFind',
+    'Q6_BrandsAware','Q7_Switching',
+    'Q8_FavFlavour','Q8_AmulHasIt',
+    'Q9_Kool_Lassi_Chaach',
+    'Q10_Tru_Awareness','Q10_Tru_Taste','Q10_Tru_Value','Q10_Tru_WouldBuyAgain','Q10_Tru_VsCompetitor',
+    'Q11_PriceSensitivity','Q12_Suggestion',
+    'Q13_Age','Q13_Gender','Q13_Location','Q13_Cluster'];
+  function e(v) { return '"' + String(v || '').replace(/"/g, '""') + '"'; }
+  var rows = [cols.join(',')];
+  for (var k = 0; k < all.length; k++) {
+    var r = all[k];
+    rows.push([
+      r._id, r._ts,
+      e(r.q1 ? r.q1.v : ''), e(r.q2 ? r.q2.v : ''), e(r.q3 ? r.q3.v : ''),
+      e(r.q4 && r.q4.fields ? r.q4.fields[0] : ''), e(r.q4 && r.q4.fields ? r.q4.fields[1] : ''),
+      e(r.q5 ? r.q5['Taste / Swad'] : ''), e(r.q5 ? r.q5['Value for money'] : ''),
+      e(r.q5 ? r.q5['Flavour variety'] : ''), e(r.q5 ? r.q5['Easy to find'] : ''),
+      e(r.q6 && r.q6.v ? r.q6.v.join(' | ') : ''),
+      e(r.q7 ? r.q7.v : ''),
+      e(r.q8 ? r.q8.v : ''), e(r.q8 ? r.q8.amul : ''),
+      e(r.q9 ? r.q9.v : ''),
+      e(r.q10 ? r.q10.aware : ''), e(r.q10 ? r.q10['Taste'] : ''),
+      e(r.q10 ? r.q10['Value for money'] : ''), e(r.q10 ? r.q10['Would buy again'] : ''),
+      e(r.q10 ? r.q10.comp : ''),
+      e(r.q11 ? r.q11.v : ''), e(r.q12 ? r.q12.v : ''),
+      e(r.q13 ? r.q13.age : ''), e(r.q13 ? r.q13.gender : ''),
+      e(r.q13 ? r.q13.loc : ''), e(r.q13 ? r.q13.cluster : '')
+    ].join(','));
+  }
+  var blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'Amul_Rajkot_Survey_' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
